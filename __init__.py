@@ -3,7 +3,8 @@ from datetime import date, timedelta
 from pptx import Presentation
 from pptx.chart.data import ChartData
 from pptx.enum.chart import XL_CHART_TYPE
-
+from pptx.util import Pt
+from pptx.enum.text import PP_ALIGN
 import pandas as pd
 
 
@@ -33,15 +34,22 @@ def df_to_table(shape, df):
     # 填写表头
     colnames = list(df.columns)
     for col_index, col_name in enumerate(colnames):
-        tb.cell(0, col_index).text = col_name
+        cell = tb.cell(0, col_index)
+        cell.text = col_name
+        paragraph = cell.text_frame.paragraphs[0]
+        paragraph.font.size = Pt(14)
+        paragraph.alignment = PP_ALIGN.CENTER
 
     # 填写数据
     m = df.as_matrix()
     for row in range(rows):
         for col in range(cols):
             val = m[row, col]
-            text = str(val)
-            tb.cell(row + 1, col).text = text
+            cell = tb.cell(row + 1, col)
+            cell.text = str(val)
+            paragraph = cell.text_frame.paragraphs[0]
+            paragraph.font.size = Pt(12)
+            paragraph.alignment = PP_ALIGN.CENTER
 
 
 def chart(df):
@@ -120,7 +128,7 @@ class Report:
 
 
 if __name__ == '__main__':
-    analyze_ppt('周报母版.pptx', 'out.pptx')
+    # analyze_ppt('周报母版.pptx', 'out.pptx')
     r = Report('周报母版.pptx')
     df1 = pd.read_excel('dataframes.xlsx', '00df1', index_col=0)
     df2 = pd.read_excel('dataframes.xlsx', '00df2', index_col=0)
